@@ -8,9 +8,6 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Collections.Generic;
-using MySql.Data.MySqlClient;
-using System.IO;
 
 
 namespace adatbázis
@@ -31,15 +28,18 @@ namespace adatbázis
             public int Magyar { get; set; }
         }
 
+        private List<Diak> diakok;
+
         public MainWindow()
         {
             InitializeComponent();
             InitializeDataGrid();
+            
         }
 
         private void InitializeDataGrid()
         {
-            List<Diak> diakok = new List<Diak>
+            diakok = new List<Diak>
         {
             new Diak
             {
@@ -244,12 +244,35 @@ namespace adatbázis
         };
 
             dataGrid.ItemsSource = diakok;
+
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            // Ebben a metódusban kezelheted a gombra kattintás eseményét
-            // Például: diákokhoz adás, módosítás, törlés, stb.
+            diakok.Clear();
+
+            // DataGrid adatait hozzáadjuk a Diakok listához
+            for (int i = 0; i < dataGrid.Items.Count; i++)
+            {
+                Diak diak = (Diak)dataGrid.Items[i];
+                diakok.Add(diak);
+            }
+
+            // Diakok listát beállítjuk a DataGrid forrásaként
+            dataGrid.ItemsSource = diakok;
+        }
+
+        private void Button2_Click(object sender, RoutedEventArgs e)
+        {
+            if (dataGrid != null && dataGrid.Items.Count > 1 )
+            {
+                (dataGrid.ItemsSource as List<Diak>)?.RemoveAt(dataGrid.Items.Count - 2);
+                dataGrid.Items.Refresh();
+            }
+            else
+            {
+                MessageBox.Show("Nincs több érték!");
+            }
         }
     }
 }

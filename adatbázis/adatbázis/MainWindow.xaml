@@ -20,6 +20,10 @@
             <Button Content="Vizsgálat és Feltöltés" 
                     Margin="10px" 
                     Click="Button_Click"/>
+            <Button Grid.Column="1"
+                    Content="Utolsó adat törlése" 
+                    Margin="10px" 
+                    Click="Button2_Click"/>
         </Grid>
     </Grid>
 </Window>

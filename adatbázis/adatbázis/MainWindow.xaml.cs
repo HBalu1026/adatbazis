@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using MySql.Data.MySqlClient;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -249,17 +250,41 @@ namespace adatbázis
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            diakok.Clear();
+            string connectionString = "Server=localhost;Database=minikozfelvi;username=root;password=;";
 
-            // DataGrid adatait hozzáadjuk a Diakok listához
-            for (int i = 0; i < dataGrid.Items.Count; i++)
+            using (MySqlConnection connection = new MySqlConnection(connectionString))
             {
-                Diak diak = (Diak)dataGrid.Items[i];
-                diakok.Add(diak);
-            }
+                connection.Open();
 
-            // Diakok listát beállítjuk a DataGrid forrásaként
-            dataGrid.ItemsSource = diakok;
+                // Diakok tábla tartalmát töröljük
+                using (MySqlCommand deleteCommand = new MySqlCommand("DELETE FROM diakok", connection))
+                {
+                    deleteCommand.ExecuteNonQuery();
+                }
+
+                // Diakok listát feltöltjük a DataGrid adataival
+                foreach (var item in dataGrid.Items)
+                {
+                    if (item is Diak diak)
+                    {
+                        string insertQuery = "INSERT INTO diakok (OM_Azonosito, Neve, ErtesitesiCime, Email, SzuletesiDatum, Matematika, Magyar) VALUES (@OM_Azonosito, @Neve, @ErtesitesiCime, @Email, @SzuletesiDatum, @Matematika, @Magyar)";
+
+                        using (MySqlCommand insertCommand = new MySqlCommand(insertQuery, connection))
+                        {
+                            insertCommand.Parameters.AddWithValue("@OM_Azonosito", diak.OM_Azonosito);
+                            insertCommand.Parameters.AddWithValue("@Neve", diak.Neve);
+                            insertCommand.Parameters.AddWithValue("@ErtesitesiCime", diak.ErtesitesiCime);
+                            insertCommand.Parameters.AddWithValue("@Email", diak.Email);
+                            insertCommand.Parameters.AddWithValue("@SzuletesiDatum", diak.SzuletesiDatum);
+                            insertCommand.Parameters.AddWithValue("@Matematika", diak.Matematika);
+                            insertCommand.Parameters.AddWithValue("@Magyar", diak.Magyar);
+
+                            insertCommand.ExecuteNonQuery();
+                        }
+                    }
+                }
+                connection.Close();
+            }
         }
 
         private void Button2_Click(object sender, RoutedEventArgs e)
